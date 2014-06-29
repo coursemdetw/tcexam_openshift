@@ -29,7 +29,8 @@
  * @since 2004-04-20
  */
 
-header('Location: public/code/index.php'); //redirect browser to public main page
+//header('Location: public/code/index.php'); //redirect browser to public main page
+include('./public/code/index.php');
 
 //============================================================+
 // END OF FILE
