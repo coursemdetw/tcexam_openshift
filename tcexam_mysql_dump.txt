@@ -1,0 +1,303 @@
+-- Adminer 4.0.3 MySQL dump
+
+SET NAMES utf8;
+SET foreign_key_checks = 0;
+SET time_zone = '+08:00';
+SET sql_mode = 'NO_AUTO_VALUE_ON_ZERO';
+
+DROP TABLE IF EXISTS `tce_answers`;
+CREATE TABLE `tce_answers` (
+  `answer_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `answer_question_id` bigint(20) unsigned NOT NULL,
+  `answer_description` text COLLATE utf8_unicode_ci NOT NULL,
+  `answer_explanation` text COLLATE utf8_unicode_ci,
+  `answer_isright` tinyint(1) NOT NULL DEFAULT '0',
+  `answer_enabled` tinyint(1) NOT NULL DEFAULT '0',
+  `answer_position` bigint(20) unsigned DEFAULT NULL,
+  `answer_keyboard_key` smallint(10) unsigned DEFAULT NULL,
+  PRIMARY KEY (`answer_id`),
+  KEY `p_answer_question_id` (`answer_question_id`),
+  CONSTRAINT `tce_answers_ibfk_1` FOREIGN KEY (`answer_question_id`) REFERENCES `tce_questions` (`question_id`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+
+DROP TABLE IF EXISTS `tce_modules`;
+CREATE TABLE `tce_modules` (
+  `module_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `module_name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `module_enabled` tinyint(1) NOT NULL DEFAULT '0',
+  `module_user_id` bigint(20) unsigned NOT NULL DEFAULT '1',
+  PRIMARY KEY (`module_id`),
+  UNIQUE KEY `ak_module_name` (`module_name`),
+  KEY `p_module_user_id` (`module_user_id`),
+  CONSTRAINT `tce_modules_ibfk_1` FOREIGN KEY (`module_user_id`) REFERENCES `tce_users` (`user_id`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+INSERT INTO `tce_modules` (`module_id`, `module_name`, `module_enabled`, `module_user_id`) VALUES
+(1,	'default',	1,	1);
+
+DROP TABLE IF EXISTS `tce_questions`;
+CREATE TABLE `tce_questions` (
+  `question_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `question_subject_id` bigint(20) unsigned NOT NULL,
+  `question_description` text COLLATE utf8_unicode_ci NOT NULL,
+  `question_explanation` text COLLATE utf8_unicode_ci,
+  `question_type` smallint(3) unsigned NOT NULL DEFAULT '1',
+  `question_difficulty` smallint(6) NOT NULL DEFAULT '1',
+  `question_enabled` tinyint(1) NOT NULL DEFAULT '0',
+  `question_position` bigint(20) unsigned DEFAULT NULL,
+  `question_timer` smallint(10) DEFAULT NULL,
+  `question_fullscreen` tinyint(1) NOT NULL DEFAULT '0',
+  `question_inline_answers` tinyint(1) NOT NULL DEFAULT '0',
+  `question_auto_next` tinyint(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`question_id`),
+  KEY `p_question_subject_id` (`question_subject_id`),
+  CONSTRAINT `tce_questions_ibfk_1` FOREIGN KEY (`question_subject_id`) REFERENCES `tce_subjects` (`subject_id`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+
+DROP TABLE IF EXISTS `tce_sessions`;
+CREATE TABLE `tce_sessions` (
+  `cpsession_id` varchar(32) COLLATE utf8_unicode_ci NOT NULL,
+  `cpsession_expiry` datetime NOT NULL,
+  `cpsession_data` text COLLATE utf8_unicode_ci NOT NULL,
+  PRIMARY KEY (`cpsession_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+INSERT INTO `tce_sessions` (`cpsession_id`, `cpsession_expiry`, `cpsession_data`) VALUES
+('69f33290e63d3260b52e04506f8ac124',	'2014-06-29 17:28:57',	'session_hash|s:32:\"fde14f1cbdd1a4352b59f2913e7209b7\";session_user_id|s:1:\"2\";session_user_name|s:5:\"admin\";session_user_ip|s:39:\"0000:0000:0000:0000:0000:ffff:7f00:0001\";session_user_level|s:2:\"10\";session_user_firstname|s:0:\"\";session_user_lastname|s:0:\"\";session_test_login|s:0:\"\";session_last_visit|i:1404029666;');
+
+DROP TABLE IF EXISTS `tce_sslcerts`;
+CREATE TABLE `tce_sslcerts` (
+  `ssl_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `ssl_name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `ssl_hash` varchar(32) COLLATE utf8_unicode_ci NOT NULL,
+  `ssl_end_date` datetime NOT NULL,
+  `ssl_enabled` tinyint(1) NOT NULL DEFAULT '0',
+  `ssl_user_id` bigint(20) unsigned NOT NULL DEFAULT '1',
+  PRIMARY KEY (`ssl_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+
+DROP TABLE IF EXISTS `tce_subjects`;
+CREATE TABLE `tce_subjects` (
+  `subject_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `subject_module_id` bigint(20) unsigned NOT NULL DEFAULT '1',
+  `subject_name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `subject_description` text COLLATE utf8_unicode_ci,
+  `subject_enabled` tinyint(1) NOT NULL DEFAULT '0',
+  `subject_user_id` bigint(20) unsigned NOT NULL DEFAULT '1',
+  PRIMARY KEY (`subject_id`),
+  UNIQUE KEY `ak_subject_name` (`subject_module_id`,`subject_name`),
+  KEY `p_subject_user_id` (`subject_user_id`),
+  CONSTRAINT `tce_subjects_ibfk_2` FOREIGN KEY (`subject_module_id`) REFERENCES `tce_modules` (`module_id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  CONSTRAINT `tce_subjects_ibfk_1` FOREIGN KEY (`subject_user_id`) REFERENCES `tce_users` (`user_id`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+
+DROP TABLE IF EXISTS `tce_testgroups`;
+CREATE TABLE `tce_testgroups` (
+  `tstgrp_test_id` bigint(20) unsigned NOT NULL,
+  `tstgrp_group_id` bigint(20) unsigned NOT NULL,
+  PRIMARY KEY (`tstgrp_test_id`,`tstgrp_group_id`),
+  KEY `p_tstgrp_test_id` (`tstgrp_test_id`),
+  KEY `p_tstgrp_group_id` (`tstgrp_group_id`),
+  CONSTRAINT `tce_testgroups_ibfk_2` FOREIGN KEY (`tstgrp_group_id`) REFERENCES `tce_user_groups` (`group_id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  CONSTRAINT `tce_testgroups_ibfk_1` FOREIGN KEY (`tstgrp_test_id`) REFERENCES `tce_tests` (`test_id`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+
+DROP TABLE IF EXISTS `tce_tests`;
+CREATE TABLE `tce_tests` (
+  `test_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `test_name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `test_description` text COLLATE utf8_unicode_ci NOT NULL,
+  `test_begin_time` datetime DEFAULT NULL,
+  `test_end_time` datetime DEFAULT NULL,
+  `test_duration_time` smallint(10) unsigned NOT NULL DEFAULT '0',
+  `test_ip_range` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '*.*.*.*',
+  `test_results_to_users` tinyint(1) NOT NULL DEFAULT '0',
+  `test_report_to_users` tinyint(1) NOT NULL DEFAULT '0',
+  `test_score_right` decimal(10,3) DEFAULT '1.000',
+  `test_score_wrong` decimal(10,3) DEFAULT '0.000',
+  `test_score_unanswered` decimal(10,3) DEFAULT '0.000',
+  `test_max_score` decimal(10,3) NOT NULL DEFAULT '0.000',
+  `test_user_id` bigint(20) unsigned NOT NULL DEFAULT '1',
+  `test_score_threshold` decimal(10,3) DEFAULT '0.000',
+  `test_random_questions_select` tinyint(1) NOT NULL DEFAULT '1',
+  `test_random_questions_order` tinyint(1) NOT NULL DEFAULT '1',
+  `test_questions_order_mode` smallint(3) unsigned NOT NULL DEFAULT '0',
+  `test_random_answers_select` tinyint(1) NOT NULL DEFAULT '1',
+  `test_random_answers_order` tinyint(1) NOT NULL DEFAULT '1',
+  `test_answers_order_mode` smallint(3) unsigned NOT NULL DEFAULT '0',
+  `test_comment_enabled` tinyint(1) NOT NULL DEFAULT '1',
+  `test_menu_enabled` tinyint(1) NOT NULL DEFAULT '1',
+  `test_noanswer_enabled` tinyint(1) NOT NULL DEFAULT '1',
+  `test_mcma_radio` tinyint(1) NOT NULL DEFAULT '1',
+  `test_repeatable` tinyint(1) NOT NULL DEFAULT '0',
+  `test_mcma_partial_score` tinyint(1) NOT NULL DEFAULT '1',
+  `test_logout_on_timeout` tinyint(1) NOT NULL DEFAULT '0',
+  `test_password` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`test_id`),
+  UNIQUE KEY `ak_test_name` (`test_name`),
+  KEY `p_test_user_id` (`test_user_id`),
+  CONSTRAINT `tce_tests_ibfk_1` FOREIGN KEY (`test_user_id`) REFERENCES `tce_users` (`user_id`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+
+DROP TABLE IF EXISTS `tce_testsslcerts`;
+CREATE TABLE `tce_testsslcerts` (
+  `tstssl_test_id` bigint(20) unsigned NOT NULL,
+  `tstssl_ssl_id` bigint(20) unsigned NOT NULL,
+  PRIMARY KEY (`tstssl_test_id`,`tstssl_ssl_id`),
+  KEY `p_tstssl_test_id` (`tstssl_test_id`),
+  KEY `p_tstssl_ssl_id` (`tstssl_ssl_id`),
+  CONSTRAINT `tce_testsslcerts_ibfk_2` FOREIGN KEY (`tstssl_ssl_id`) REFERENCES `tce_sslcerts` (`ssl_id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  CONSTRAINT `tce_testsslcerts_ibfk_1` FOREIGN KEY (`tstssl_test_id`) REFERENCES `tce_tests` (`test_id`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+
+DROP TABLE IF EXISTS `tce_tests_logs`;
+CREATE TABLE `tce_tests_logs` (
+  `testlog_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `testlog_testuser_id` bigint(20) unsigned NOT NULL,
+  `testlog_user_ip` varchar(39) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `testlog_question_id` bigint(20) unsigned NOT NULL,
+  `testlog_answer_text` text COLLATE utf8_unicode_ci,
+  `testlog_score` decimal(10,3) DEFAULT NULL,
+  `testlog_creation_time` datetime DEFAULT NULL,
+  `testlog_display_time` datetime DEFAULT NULL,
+  `testlog_change_time` datetime DEFAULT NULL,
+  `testlog_reaction_time` bigint(20) unsigned NOT NULL DEFAULT '0',
+  `testlog_order` smallint(6) NOT NULL DEFAULT '1',
+  `testlog_num_answers` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `testlog_comment` text COLLATE utf8_unicode_ci,
+  PRIMARY KEY (`testlog_id`),
+  UNIQUE KEY `ak_testuser_question` (`testlog_testuser_id`,`testlog_question_id`),
+  KEY `p_testlog_question_id` (`testlog_question_id`),
+  KEY `p_testlog_testuser_id` (`testlog_testuser_id`),
+  CONSTRAINT `tce_tests_logs_ibfk_2` FOREIGN KEY (`testlog_testuser_id`) REFERENCES `tce_tests_users` (`testuser_id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  CONSTRAINT `tce_tests_logs_ibfk_1` FOREIGN KEY (`testlog_question_id`) REFERENCES `tce_questions` (`question_id`) ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+
+DROP TABLE IF EXISTS `tce_tests_logs_answers`;
+CREATE TABLE `tce_tests_logs_answers` (
+  `logansw_testlog_id` bigint(20) unsigned NOT NULL,
+  `logansw_answer_id` bigint(20) unsigned NOT NULL,
+  `logansw_selected` smallint(6) NOT NULL DEFAULT '-1',
+  `logansw_order` smallint(6) NOT NULL DEFAULT '1',
+  `logansw_position` bigint(20) unsigned DEFAULT NULL,
+  PRIMARY KEY (`logansw_testlog_id`,`logansw_answer_id`),
+  KEY `p_logansw_answer_id` (`logansw_answer_id`),
+  KEY `p_logansw_testlog_id` (`logansw_testlog_id`),
+  CONSTRAINT `tce_tests_logs_answers_ibfk_2` FOREIGN KEY (`logansw_testlog_id`) REFERENCES `tce_tests_logs` (`testlog_id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  CONSTRAINT `tce_tests_logs_answers_ibfk_1` FOREIGN KEY (`logansw_answer_id`) REFERENCES `tce_answers` (`answer_id`) ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+
+DROP TABLE IF EXISTS `tce_tests_users`;
+CREATE TABLE `tce_tests_users` (
+  `testuser_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `testuser_test_id` bigint(20) unsigned NOT NULL,
+  `testuser_user_id` bigint(20) unsigned NOT NULL,
+  `testuser_status` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `testuser_creation_time` datetime NOT NULL,
+  `testuser_comment` text COLLATE utf8_unicode_ci,
+  PRIMARY KEY (`testuser_id`),
+  UNIQUE KEY `ak_testuser` (`testuser_test_id`,`testuser_user_id`,`testuser_status`),
+  KEY `p_testuser_user_id` (`testuser_user_id`),
+  KEY `p_testuser_test_id` (`testuser_test_id`),
+  CONSTRAINT `tce_tests_users_ibfk_2` FOREIGN KEY (`testuser_test_id`) REFERENCES `tce_tests` (`test_id`) ON DELETE CASCADE,
+  CONSTRAINT `tce_tests_users_ibfk_1` FOREIGN KEY (`testuser_user_id`) REFERENCES `tce_users` (`user_id`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+
+DROP TABLE IF EXISTS `tce_testuser_stat`;
+CREATE TABLE `tce_testuser_stat` (
+  `tus_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tus_date` datetime NOT NULL,
+  PRIMARY KEY (`tus_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+
+DROP TABLE IF EXISTS `tce_test_subjects`;
+CREATE TABLE `tce_test_subjects` (
+  `subjset_tsubset_id` bigint(20) unsigned NOT NULL,
+  `subjset_subject_id` bigint(20) unsigned NOT NULL,
+  PRIMARY KEY (`subjset_tsubset_id`,`subjset_subject_id`),
+  KEY `p_subjset_subject_id` (`subjset_subject_id`),
+  KEY `p_subjset_tsubset_id` (`subjset_tsubset_id`),
+  CONSTRAINT `tce_test_subjects_ibfk_2` FOREIGN KEY (`subjset_tsubset_id`) REFERENCES `tce_test_subject_set` (`tsubset_id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  CONSTRAINT `tce_test_subjects_ibfk_1` FOREIGN KEY (`subjset_subject_id`) REFERENCES `tce_subjects` (`subject_id`) ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+
+DROP TABLE IF EXISTS `tce_test_subject_set`;
+CREATE TABLE `tce_test_subject_set` (
+  `tsubset_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tsubset_test_id` bigint(20) unsigned NOT NULL,
+  `tsubset_type` smallint(6) NOT NULL DEFAULT '1',
+  `tsubset_difficulty` smallint(6) NOT NULL DEFAULT '1',
+  `tsubset_quantity` smallint(6) NOT NULL DEFAULT '1',
+  `tsubset_answers` smallint(6) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`tsubset_id`),
+  KEY `p_tsubset_test_id` (`tsubset_test_id`),
+  CONSTRAINT `tce_test_subject_set_ibfk_1` FOREIGN KEY (`tsubset_test_id`) REFERENCES `tce_tests` (`test_id`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+
+DROP TABLE IF EXISTS `tce_users`;
+CREATE TABLE `tce_users` (
+  `user_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `user_name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `user_password` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `user_email` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `user_regdate` datetime NOT NULL,
+  `user_ip` varchar(39) COLLATE utf8_unicode_ci NOT NULL,
+  `user_firstname` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `user_lastname` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `user_birthdate` date DEFAULT NULL,
+  `user_birthplace` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `user_regnumber` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `user_ssn` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `user_level` smallint(3) unsigned NOT NULL DEFAULT '1',
+  `user_verifycode` varchar(32) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `user_otpkey` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`user_id`),
+  UNIQUE KEY `ak_user_name` (`user_name`),
+  UNIQUE KEY `user_verifycode` (`user_verifycode`),
+  UNIQUE KEY `ak_user_regnumber` (`user_regnumber`),
+  UNIQUE KEY `ak_user_ssn` (`user_ssn`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+INSERT INTO `tce_users` (`user_id`, `user_name`, `user_password`, `user_email`, `user_regdate`, `user_ip`, `user_firstname`, `user_lastname`, `user_birthdate`, `user_birthplace`, `user_regnumber`, `user_ssn`, `user_level`, `user_verifycode`, `user_otpkey`) VALUES
+(1,	'anonymous',	'6d068345f42a134a12adddadead25ffd',	NULL,	'2001-01-01 01:01:01',	'0.0.0.0',	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	0,	NULL,	NULL),
+(2,	'admin',	'c574b5b09ab10f4f39ae9dce6d539cf0',	NULL,	'2001-01-01 01:01:01',	'127.0.0.0',	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	10,	NULL,	NULL);
+
+DROP TABLE IF EXISTS `tce_user_groups`;
+CREATE TABLE `tce_user_groups` (
+  `group_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `group_name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  PRIMARY KEY (`group_id`),
+  UNIQUE KEY `group_name` (`group_name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+INSERT INTO `tce_user_groups` (`group_id`, `group_name`) VALUES
+(1,	'default');
+
+DROP TABLE IF EXISTS `tce_usrgroups`;
+CREATE TABLE `tce_usrgroups` (
+  `usrgrp_user_id` bigint(20) unsigned NOT NULL,
+  `usrgrp_group_id` bigint(20) unsigned NOT NULL,
+  PRIMARY KEY (`usrgrp_user_id`,`usrgrp_group_id`),
+  KEY `p_usrgrp_user_id` (`usrgrp_user_id`),
+  KEY `p_usrgrp_group_id` (`usrgrp_group_id`),
+  CONSTRAINT `tce_usrgroups_ibfk_2` FOREIGN KEY (`usrgrp_group_id`) REFERENCES `tce_user_groups` (`group_id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  CONSTRAINT `tce_usrgroups_ibfk_1` FOREIGN KEY (`usrgrp_user_id`) REFERENCES `tce_users` (`user_id`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+INSERT INTO `tce_usrgroups` (`usrgrp_user_id`, `usrgrp_group_id`) VALUES
+(2,	1);
+
+-- 2014-06-29 16:31:30
