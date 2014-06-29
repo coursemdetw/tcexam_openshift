@@ -1,7 +1,7 @@
-ln -sf $OPENSHIFT_DATA_DIR/public/config $OPENSHIFT_REPO_DIR/public/config
+ln -sf $OPENSHIFT_DATA_DIR/public/config $OPENSHIFT_REPO_DIR/php/public/config
 
-ln -sf $OPENSHIFT_DATA_DIR/admin/config $OPENSHIFT_REPO_DIR/admin/config
+ln -sf $OPENSHIFT_DATA_DIR/admin/config $OPENSHIFT_REPO_DIR/php/admin/config
 
-ln -sf $OPENSHIFT_DATA_DIR/shared/config $OPENSHIFT_REPO_DIR/shared/config
+ln -sf $OPENSHIFT_DATA_DIR/shared/config $OPENSHIFT_REPO_DIR/php/shared/config
 
-ln -sf $OPENSHIFT_DATA_DIR/cache $OPENSHIFT_REPO_DIR/cache
+ln -sf $OPENSHIFT_DATA_DIR/cache $OPENSHIFT_REPO_DIR/php/cache
