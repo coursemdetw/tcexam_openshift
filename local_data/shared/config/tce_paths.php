@@ -31,7 +31,7 @@
 /**
  * Host URL (e.g.: "http://www.yoursite.com").
  */
-define ('K_PATH_HOST', "https://".$_ENV['OPENSHIFT_APP_DNS']);
+define ('K_PATH_HOST', "http://".$_ENV['OPENSHIFT_APP_DNS']);
 
 /**
  * Relative URL where this program is installed (e.g.: "/").

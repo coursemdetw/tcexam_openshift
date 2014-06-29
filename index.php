@@ -29,7 +29,7 @@
  * @since 2004-04-20
  */
 
-header("Location: https://".$_ENV['OPENSHIFT_APP_DNS']."public/code/index.php"); //redirect browser to public main page
+header('Location: public/code/index.php'); //redirect browser to public main page
 
 //============================================================+
 // END OF FILE
