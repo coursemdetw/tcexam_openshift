@@ -6,6 +6,9 @@ ORGANIZATION IS ASKING ANY FEE TO ITS MEMBERS/USERS,
 YOU MUST CONTACT INFO@TECNICK.COM TO PURCHASE A LICENSE.
 
 ------------------------------------------------------------
+Default administrator account: admin
+
+Default admin password: 1234
 
 Name: TCExam
 
